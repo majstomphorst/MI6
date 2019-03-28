@@ -3,14 +3,16 @@ package main.ma.maxim;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Login {
+public class LoginModel {
 
     private String secret;
     private Integer id;
+    private Boolean loginState;
     private static List<Integer> blackList = new ArrayList<Integer>();
 
-    public Login() {
+    public LoginModel() {
         secret = "For ThE Royal QUEEN";
+        loginState = false;
     }
 
     public Integer getId() {
@@ -18,23 +20,21 @@ public class Login {
     }
 
     public boolean isLoggedIn() {
-        if (id != null) {
-            return true;
-        }
-        return false;
+        return loginState;
     }
 
-    public boolean validateSecretLine(String input, Integer number) {
+    public boolean validateSecretLine(String input) {
         if (input.equals(secret)) {
-            id = number;
+            loginState = true;
             return true;
         }
-        blackList.add(number);
+        blackList.add(id);
         return false;
     }
 
     public boolean isValid(int number) {
         if (isValidNumber(number) && !isInBlackList(number)) {
+            id = number;
             return true;
         }
         return false;
