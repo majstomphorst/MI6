@@ -1,0 +1,12 @@
+package main.ma.maxim;
+
+enum State {
+    STATE_WELCOME,
+    STATE_MENU,
+    STATE_LOGIN,
+    STATE_SECRET,
+    STATE_ACCESS_GRANTED,
+    STATE_EXIT,
+    STATE_SECRET_FAILED,
+    STATE_LOGIN_FAILED
+}
