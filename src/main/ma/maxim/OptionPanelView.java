@@ -2,8 +2,6 @@ package main.ma.maxim;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 enum State {
     STATE_WELCOME,
@@ -27,6 +25,7 @@ public class OptionPanelView {
     }
 
     public void updateView() {
+
             switch (state) {
                 case STATE_WELCOME:
                     displayWelcome();
@@ -35,15 +34,15 @@ public class OptionPanelView {
                     break;
 
                 case STATE_MENU:
-                    state = displayMenu();
+                    state = showMenu();
                     updateView();
                     break;
 
                 case STATE_LOGIN_FAILED:
-                    showLoginFaild();
+                    showLoginFailed();
 
                 case STATE_LOGIN:
-                    var userNumber = showLogin();
+                    var userNumber = showlogin();
                     presenter.validateLogin(userNumber);
                     break;
 
@@ -54,27 +53,29 @@ public class OptionPanelView {
 
                 case STATE_SECRET_FAILED:
                     showSecretFailed();
+                    state = State.STATE_MENU;
+                    updateView();
                     break;
 
                 case STATE_ACCESS_GRANTED:
-                    System.out.println("STATE_ACCESS_GRANTED");
-                    presenter.exit();
+                    Integer id = presenter.getInfo();
+                    showLognedInMenu(ServiceNumberHelper.getUserName(id));
+                    break;
 
                 case STATE_EXIT:
                     presenter.exit();
                     break;
 
             }
-
-
     }
 
     private void showSecretFailed() {
-        System.out.println("showSecretFailed");
+        displayWaring("Secret Line Failed",
+                "You cant login anymore\n until the system reboots");
     }
 
-    private void showLoginFaild() {
-        System.out.println("showLoginFailed");
+    private void showLoginFailed() {
+        displayWaring("Login Failed","Please try it again.");
     }
 
     public void setState(State newState) {
@@ -92,7 +93,34 @@ public class OptionPanelView {
         return userString;
     }
 
-    private State displayMenu() {
+    private State showLognedInMenu(String agentNumber) {
+        var optionList = new ArrayList<String>();
+        optionList.add("Logout");
+
+        Object[] options = optionList.toArray();
+
+        int value = JOptionPane.showOptionDialog(
+                null,
+                agentNumber + " select an option:",
+                "LogedIn Menu",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                optionList.get(0)
+        );
+
+        switch (optionList.get(value)) {
+            case "Logout":
+                return State.STATE_EXIT;
+            default:
+                return State.STATE_MENU;
+
+        }
+
+    }
+
+    private State showMenu() {
 
         var optionList = new ArrayList<String>();
         optionList.add("Login");
@@ -126,7 +154,7 @@ public class OptionPanelView {
         this.presenter = presenter;
     }
 
-    private Integer showLogin() {
+    private Integer showlogin() {
         Integer userNumber = 0;
 
         String userString = JOptionPane.showInputDialog(
@@ -155,6 +183,17 @@ public class OptionPanelView {
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
+
+    private void displayWaring(String title, String message) {
+        JOptionPane.showMessageDialog(
+                null,
+                message,
+                title,
+                JOptionPane.WARNING_MESSAGE);
+
+    }
+
+
 
 
 }

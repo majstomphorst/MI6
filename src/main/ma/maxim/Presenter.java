@@ -25,7 +25,6 @@ public class Presenter {
         } else {
             view.setState(State.STATE_LOGIN_FAILED);
         }
-
         view.updateView();
     }
 
@@ -36,6 +35,10 @@ public class Presenter {
              view.setState(State.STATE_SECRET_FAILED);
          }
          view.updateView();
+    }
+
+    public Integer getInfo() {
+        return model.getId();
     }
 
 }
