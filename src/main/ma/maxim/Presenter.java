@@ -2,14 +2,13 @@ package main.ma.maxim;
 
 public class Presenter {
 
-    private OptionPanelView view;
+    private ViewInterface view;
     private LoginModel model;
 
-    public Presenter(OptionPanelView view, LoginModel model) {
+    public Presenter(ViewInterface view, LoginModel model) {
         this.view = view;
         this.model = model;
     }
-
 
     public void run() {
         view.updateView();
@@ -39,6 +38,22 @@ public class Presenter {
 
     public Integer getInfo() {
         return model.getId();
+    }
+
+    public void validateLoginForm(Integer number,String line) {
+
+
+        if (!model.isValid(number)) {
+            view.setState(State.STATE_LOGIN_FAILED);
+            return;
+        }
+
+        if (!model.validateSecretLine(line)) {
+            view.setState(State.STATE_SECRET_FAILED);
+            return;
+        }
+        view.setState(State.STATE_ACCESS_GRANTED);
+
     }
 
 }

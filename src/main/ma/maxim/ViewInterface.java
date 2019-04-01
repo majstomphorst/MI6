@@ -1,4 +1,10 @@
 package main.ma.maxim;
 
-public class ViewInterface {
+interface ViewInterface {
+
+    public void setPresenter(Presenter presenter);
+
+    public void setState(State newState);
+
+    public void updateView();
 }

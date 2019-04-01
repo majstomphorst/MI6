@@ -3,19 +3,8 @@ package main.ma.maxim;
 import javax.swing.*;
 import java.util.ArrayList;
 
-enum State {
-    STATE_WELCOME,
-    STATE_MENU,
-    STATE_LOGIN,
-    STATE_SECRET,
-    STATE_ACCESS_GRANTED,
-    STATE_EXIT,
-    STATE_SECRET_FAILED,
-    STATE_LOGIN_FAILED
-}
 
-
-public class OptionPanelView {
+public class OptionPanelView implements ViewInterface {
 
     private Presenter presenter;
     private State state;
@@ -24,11 +13,19 @@ public class OptionPanelView {
         state = State.STATE_WELCOME;
     }
 
+    public void setPresenter(Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void setState(State newState) {
+        state = newState;
+    }
+
     public void updateView() {
 
             switch (state) {
                 case STATE_WELCOME:
-                    displayWelcome();
+                    displayMessage("MI6","Welcome","Agent");
                     state = State.STATE_MENU;
                     updateView();
                     break;
@@ -39,10 +36,10 @@ public class OptionPanelView {
                     break;
 
                 case STATE_LOGIN_FAILED:
-                    showLoginFailed();
+                    displayMessage("Login Failed","Please try it again.","");
 
                 case STATE_LOGIN:
-                    var userNumber = showlogin();
+                    var userNumber = showLogin();
                     presenter.validateLogin(userNumber);
                     break;
 
@@ -52,7 +49,8 @@ public class OptionPanelView {
                     break;
 
                 case STATE_SECRET_FAILED:
-                    showSecretFailed();
+                    displayMessage("Secret Line Failed",
+                            "You cant login anymore","until the system reboots");
                     state = State.STATE_MENU;
                     updateView();
                     break;
@@ -69,21 +67,7 @@ public class OptionPanelView {
             }
     }
 
-    private void showSecretFailed() {
-        displayWaring("Secret Line Failed",
-                "You cant login anymore\n until the system reboots");
-    }
-
-    private void showLoginFailed() {
-        displayWaring("Login Failed","Please try it again.");
-    }
-
-    public void setState(State newState) {
-        state = newState;
-    }
-
     private String showSecretLine() {
-
         String userString = JOptionPane.showInputDialog(
                 null,
                 "Enter the secret line",
@@ -150,11 +134,7 @@ public class OptionPanelView {
         }
     }
 
-    public void setPresenter(Presenter presenter) {
-        this.presenter = presenter;
-    }
-
-    private Integer showlogin() {
+    private Integer showLogin() {
         Integer userNumber = 0;
 
         String userString = JOptionPane.showInputDialog(
@@ -173,27 +153,12 @@ public class OptionPanelView {
         }
     }
 
-    private void displayWelcome() {
 
-        // prompt the user to enter their name
+    private void displayMessage(String title, String lineOne, String lineTwo) {
         JOptionPane.showMessageDialog(
                 null,
-                "Welcome agent",
-                "MI6",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    private void displayWaring(String title, String message) {
-        JOptionPane.showMessageDialog(
-                null,
-                message,
+                lineOne + "\n"+ lineTwo,
                 title,
-                JOptionPane.WARNING_MESSAGE);
-
+                JOptionPane.INFORMATION_MESSAGE);
     }
-
-
-
-
 }
