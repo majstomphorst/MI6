@@ -2,22 +2,17 @@ package main.ma.maxim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import java.lang.reflect.Field;
 
 class DatabaseInfo {
-
     public static final String URL = "jdbc:mysql://localhost:8889/MI6?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     public static final String USER = "root";
     public static final String PASSWORD = "root";
-
 }
 
-public class Crud {
+public class Crud implements ICrud {
 
     Connection conn = null;
 
@@ -59,7 +54,9 @@ public class Crud {
                     stmt.setTimestamp(i,(Timestamp) item);
 
                 } else {
-                    System.out.println("throw error please");
+                    //todo BAD CODE!!!!!
+                    stmt.setString(i,null);
+
                 }
                 i ++;
             }
@@ -82,25 +79,28 @@ public class Crud {
     public <T extends Object> List<T> readMultiRows(String sql, List<Integer> bindParameters, Class clazz) {
 
 
-
         return null;
     }
 
-    public <T extends Object> T readOneRow(String sql,List<Object> bindParamaters, Class<T> clazz) {
+    public <T extends Object> T readOneRow(String sql, List<Object> bindParameters, Class<T> clazz) {
 
+        // the object to return
         T returnObj = null;
 
+        // the result of the SQL stmt
+        ResultSet sqlResult = null;
 
-        ResultSet result = null;
         try {
-            var stmt = prepareAndBind(sql,bindParamaters);
-            result = stmt.executeQuery();
 
-            if (result.next()) {
+            var stmt = prepareAndBind(sql, bindParameters);
+            sqlResult = stmt.executeQuery();
 
+            if (sqlResult.next()) {
 
                 try {
+                    // create a new instance of the type of clazz
                     returnObj = clazz.getConstructor().newInstance();
+
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 } catch (InstantiationException e) {
@@ -111,20 +111,21 @@ public class Crud {
                     e.printStackTrace();
                 }
 
-
-
+                // for every field or attribute in the clazz
                 for (Field field : clazz.getFields()) {
-                    if (hasColumn(result,field.getName())) {
-                        var obj = result.getObject(field.getName(), field.getType());
-                        var i = obj;
+
+                    // check if the sql and the new object have the same attribute
+                    if (hasColumn(sqlResult,field.getName())) {
+                        // get the object from the sqlResult of the correct type
+                        var obj = sqlResult.getObject(field.getName(), field.getType());
+
                         try {
+                            // put the obj attribute inside the clazz.object
                             field.set(returnObj,obj);
-                        }catch (IllegalAccessException e) {
+                        } catch (IllegalAccessException e) {
 
                         }
                     }
-
-
 
                 }
 
@@ -134,8 +135,18 @@ public class Crud {
 
         }
 
-
+        // return the filled in object
         return returnObj;
+    }
+
+
+    public Integer updateRow(String sql, List<String> bindParameters) {
+
+        return null;
+    }
+
+    public Integer deleteRows(String sql, List<String> bindParameters) {
+        return null;
     }
 
     private  boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
@@ -147,15 +158,5 @@ public class Crud {
             }
         }
         return false;
-    }
-
-
-    public Integer updateRow(String sql, List<String> bindParameters) {
-
-        return null;
-    }
-
-    public Integer deleteRows(String sql, List<String> bindParameters) {
-        return null;
     }
 }

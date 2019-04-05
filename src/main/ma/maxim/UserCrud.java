@@ -2,28 +2,31 @@ package main.ma.maxim;
 
 import java.util.ArrayList;
 
-public class UserCrud {
+public class UserCrud implements IUserCrud {
 
-    private Crud crud = null;
+    private ICrud crud = null;
 
-    public UserCrud(Crud crud)
+    public UserCrud(ICrud crud)
     {
         this.crud = crud;
     }
 
+    @Override
     public void storeUser(User user) {
+
         String sql = "INSERT INTO users (id, password, active, licence) VALUES (?, ?, ?, ?)";
 
         var userList = new ArrayList<Object>();
+
         userList.add(user.id);
-        userList.add(user.secret);
+        userList.add(user.password);
         userList.add(user.active);
         userList.add(user.licence);
-
 
         crud.createRow(sql,userList);
     }
 
+    @Override
     public User getUserById(Integer id) {
 
         String sql = "SELECT * FROM users WHERE id = ?";
@@ -32,5 +35,11 @@ public class UserCrud {
         return crud.readOneRow(sql,ids,User.class);
 
     }
+
+    @Override
+    public void updateUser(User user) {
+
+    }
+
 
 }

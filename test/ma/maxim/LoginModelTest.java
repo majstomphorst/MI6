@@ -1,6 +1,8 @@
 package ma.maxim;
 
+import main.ma.maxim.Crud;
 import main.ma.maxim.LoginModel;
+import main.ma.maxim.UserCrud;
 import org.junit.*;
 
 import java.util.Map;
@@ -19,7 +21,8 @@ public class LoginModelTest {
         map.put(999,true);
         map.put(1000,false);
 
-        var loginManager = new LoginModel();
+        var userCrud =new UserCrud(new Crud());
+        var loginManager = new LoginModel(userCrud);
 
         // validate
         for (Map.Entry<Integer, Boolean> entry : map.entrySet()) {
@@ -33,7 +36,10 @@ public class LoginModelTest {
     @Test
     public void testIsValidBlackList() {
         // prepare
-        var loginManager = new LoginModel();
+
+        // should be a test crud
+        var userCrud =new UserCrud(new Crud());
+        var loginManager = new LoginModel(userCrud);
         var correctSecretLine = "For ThE Royal QUEEN";
         var wrongSecretLine = "wrong";
         var user1 = 1;
@@ -61,7 +67,8 @@ public class LoginModelTest {
         map.put("For ThE Royal QUEEN",  true);
         map.put("for the royal queen",  false);
 
-        var loginManager = new LoginModel();
+        var userCrud =new UserCrud(new Crud());
+        var loginManager = new LoginModel(userCrud);
 
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
             var expected = entry.getValue();
@@ -74,7 +81,8 @@ public class LoginModelTest {
     @Test
     public void testIsLoggedIn() {
         // prepare
-        var loginManager = new LoginModel();
+        var userCrud =new UserCrud(new Crud());
+        var loginManager = new LoginModel(userCrud);
         var secretLine = "For ThE Royal QUEEN";
 
         // test

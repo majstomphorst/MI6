@@ -6,14 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-import static main.ma.maxim.State.*;
+public class JFrameIView implements IView {
 
-
-public class JFrameView implements ViewInterface {
-
-    private Presenter presenter;
-    private State state;
-    private String information;
+    private IPresenter presenter;
 
     private JFrame JFrame;
     private JPanel panel;
@@ -21,54 +16,10 @@ public class JFrameView implements ViewInterface {
     private JTextField code_field, secret_field;
     private JButton login_button, cancel_button;
 
-    public JFrameView() {
-        state = STATE_LOGIN;
-    }
-    public void setPresenter(Presenter presenter) {
+    public void setPresenter(IPresenter presenter) {
         this.presenter = presenter;
     }
-    public void setState(State newState) {
-        this.state = newState;
-    }
 
-    public void setMessage(String text) {
-        if (text == null) {
-            information = "";
-            return;
-        }
-
-        if (information == null) {
-            information = "";
-        }
-        information += text;
-    }
-
-    public void updateView() {
-        setMessage(null);
-
-        switch (state) {
-            case STATE_LOGIN:
-                showLogin();
-                break;
-
-            case STATE_ACCESS_GRANTED:
-                setMessage("ACCESS_GRANTED");
-                Integer id = presenter.getInfo();
-                showLognedInMenu(ServiceNumberHelper.getUserName(id));
-                break;
-
-            case STATE_EXIT:
-                presenter.exit();
-                break;
-
-            case STATE_LOGIN_FAILED:
-                setMessage("user number not valid");
-
-            case STATE_SECRET_FAILED:
-                setMessage("secret_faild you cant login any more");
-
-        }
-    }
 
     public void showLogin() {
         JFrame = new JFrame("login");
@@ -118,11 +69,6 @@ public class JFrameView implements ViewInterface {
 
                 presenter.validateLoginForm(userNumber, password);
 
-                message.setText(information);
-
-                if (state == State.STATE_ACCESS_GRANTED) {
-                    updateView();
-                }
             }
         };
 
@@ -134,11 +80,8 @@ public class JFrameView implements ViewInterface {
         JFrame.setVisible(true);
     }
 
-    private void showLognedInMenu(String userName) {
-        showMessage("Sucess",userName);
-    }
 
-    private void showMessage(String title, String message) {
+    public void showMessage(String title, String message) {
         JOptionPane.showMessageDialog(
                 null,
                 message,

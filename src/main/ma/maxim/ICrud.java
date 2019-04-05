@@ -14,6 +14,7 @@ public interface ICrud {
      */
     Integer createRow(String sql, List<Object> bindParameters);
 
+
     /**
      * Read an array of objects from the database
      *
@@ -22,7 +23,7 @@ public interface ICrud {
      * @return List<Object> or an empty list
      *
      */
-    List<Object> readMultiRows(String sql, List<String> bindParameters);
+    <T extends Object> List<T> readMultiRows(String sql, List<Integer> bindParameters, Class clazz);
 
 
     /**
@@ -33,8 +34,7 @@ public interface ICrud {
      * @return Object otherwise null
      *
      */
-    Object readOneRow(String sql, List<Object> bindParameters);
-
+    <T extends Object> T readOneRow(String sql,List<Object> bindParameters, Class<T> clazz);
     /**
      * Update values into from the database
      *
