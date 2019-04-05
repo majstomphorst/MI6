@@ -2,6 +2,7 @@ package main.ma.maxim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.lang.reflect.Field;
@@ -33,33 +34,33 @@ public class Crud implements ICrud {
     private PreparedStatement prepareAndBind(String sql, List<Object> bindParameters) throws SQLException {
 
         PreparedStatement stmt = null;
-            stmt = conn.prepareStatement(sql);
+        stmt = conn.prepareStatement(sql);
 
-            var i = 1;
-            for (Object item : bindParameters) {
-                if (item instanceof Integer) {
+        var i = 1;
+        for (Object item : bindParameters) {
+            if (item instanceof Integer) {
 
-                    stmt.setInt(i,(int) item);
+                stmt.setInt(i, (int) item);
 
-                } else if (item instanceof String) {
+            } else if (item instanceof String) {
 
-                    stmt.setString(i, item.toString());
+                stmt.setString(i, item.toString());
 
-                } else if (item instanceof Boolean) {
+            } else if (item instanceof Boolean) {
 
-                    stmt.setBoolean(i, (Boolean) item);
+                stmt.setBoolean(i, (Boolean) item);
 
-                } else if (item instanceof java.sql.Timestamp) {
+            } else if (item instanceof java.sql.Timestamp) {
 
-                    stmt.setTimestamp(i,(Timestamp) item);
+                stmt.setTimestamp(i, (Timestamp) item);
 
-                } else {
-                    //todo BAD CODE!!!!!
-                    stmt.setString(i,null);
+            } else {
+                //todo BAD CODE!!!!!
+                stmt.setString(i, null);
 
-                }
-                i ++;
             }
+            i++;
+        }
 
         return stmt;
     }
@@ -68,7 +69,7 @@ public class Crud implements ICrud {
 
         Integer result = null;
         try {
-            var stmt = prepareAndBind(sql,bindParameters);
+            var stmt = prepareAndBind(sql, bindParameters);
             result = stmt.executeUpdate();
         } catch (SQLException e) {
 
@@ -76,67 +77,64 @@ public class Crud implements ICrud {
         return result;
     }
 
-    public <T extends Object> List<T> readMultiRows(String sql, List<Integer> bindParameters, Class clazz) {
-
-
-        return null;
-    }
-
-    public <T extends Object> T readOneRow(String sql, List<Object> bindParameters, Class<T> clazz) {
-
+    public <T extends Object> List<T> readMultiRows(String sql, List<Object> bindParameters, Class<T> clazz) {
         // the object to return
-        T returnObj = null;
+        List<T> returnObjList = new ArrayList<T>();
 
         // the result of the SQL stmt
         ResultSet sqlResult = null;
 
         try {
-
             var stmt = prepareAndBind(sql, bindParameters);
             sqlResult = stmt.executeQuery();
 
-            if (sqlResult.next()) {
+            while (sqlResult.next()) {
 
-                try {
-                    // create a new instance of the type of clazz
-                    returnObj = clazz.getConstructor().newInstance();
+                // create a new instance of the type of clazz
+                T returnObj = clazz.getConstructor().newInstance();
 
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                // for every field or attribute in the clazz
                 for (Field field : clazz.getFields()) {
 
                     // check if the sql and the new object have the same attribute
-                    if (hasColumn(sqlResult,field.getName())) {
+                    if (hasColumn(sqlResult, field.getName())) {
                         // get the object from the sqlResult of the correct type
                         var obj = sqlResult.getObject(field.getName(), field.getType());
 
-                        try {
-                            // put the obj attribute inside the clazz.object
-                            field.set(returnObj,obj);
-                        } catch (IllegalAccessException e) {
+                        // put the obj attribute inside the clazz.object
+                        field.set(returnObj, obj);
 
-                        }
                     }
-
                 }
-
+                returnObjList.add(returnObj);
             }
+            // for every field or attribute in the clazz
 
-        } catch(SQLException e) {
-
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         // return the filled in object
-        return returnObj;
+        return returnObjList;
+    }
+
+    public <T extends Object> T readOneRow(String sql, List<Object> bindParameters, Class<T> clazz) {
+
+        List<T> list = readMultiRows(sql,bindParameters,clazz);
+
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+
+        // return the filled in object
+        return null;
     }
 
 
@@ -149,7 +147,7 @@ public class Crud implements ICrud {
         return null;
     }
 
-    private  boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+    private boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         int columns = rsmd.getColumnCount();
         for (int x = 1; x <= columns; x++) {

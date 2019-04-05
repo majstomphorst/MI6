@@ -6,4 +6,8 @@ public interface IUserCrud {
     User getUserById(Integer id);
 
     void updateUser(User user);
+
+    BlackList getBlackListEnteryById(Integer id);
+
+    void logAction(Integer number, Boolean succes);
 }

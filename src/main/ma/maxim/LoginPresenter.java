@@ -50,11 +50,12 @@ public class LoginPresenter extends MainPresenter implements IPresenter {
 
         // check if user is in db
         if (!model.login(number,secret)){
-
-
-
+            view.showMessage("invalid","try it again!");
+            return;
         }
 
+
+        view.showMessage("success","success!");
 
 
 

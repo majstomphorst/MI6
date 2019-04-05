@@ -23,7 +23,7 @@ public interface ICrud {
      * @return List<Object> or an empty list
      *
      */
-    <T extends Object> List<T> readMultiRows(String sql, List<Integer> bindParameters, Class clazz);
+    <T extends Object> List<T> readMultiRows(String sql, List<Object> bindParameters, Class<T> clazz);
 
 
     /**

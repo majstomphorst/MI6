@@ -1,80 +1,63 @@
 package main.ma.maxim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class LoginModel {
-    private String secret;
-    private Integer id;
-    private Boolean loginState;
-
+    private User user;
     private IUserCrud userCrud;
 
     public LoginModel(IUserCrud userCrud) {
         this.userCrud = userCrud;
-        secret = "For ThE Royal QUEEN";
-        loginState = false;
     }
 
-    public Integer getId() {
-        return id;
+    public Boolean isOnBlacklist(Integer number) {
+        var blackList = userCrud.getBlackListEnteryById(number);
+        if (blackList != null) {
+            return false;
+        }
+        return true;
+    }
+
+    public Boolean doesUserExist(Integer id) {
+        this.user = userCrud.getUserById(id);
+        if (this.user == null) {
+            return false;
+        }
+
+        return true;
     }
 
     public Boolean login(Integer number, String password) {
 
+        if(doesUserExist(number)) {
+            return false;
+        }
+
         // is user on blacklist
-        if (isInBlackList(number)) {
+        if (isOnBlacklist(number)) {
             return false;
         }
 
-       var user = userCrud.getUserById(number);
-       if (user == null) {
-           var newUser = new User(number);
-           userCrud.storeUser(newUser);
-           user = newUser;
-       }
-
-       // check is user is active
-        if (user.active) {
+        // check is user is active
+        if (!user.active) {
             return false;
         }
 
-       // check if password is valid
-        if(!user.password.equals(password)) {
+        // check if password is valid
+        if (!user.password.equals(password)) {
             // blacklist the agent
+            return false;
         }
 
         // create record for user login
+        userCrud.logAction(number, true);
 
-       return true;
+        return true;
     }
-
-    public boolean isLoggedIn() {
-        return loginState;
-    }
-
-//    public boolean validateSecretLine(String input) {
-//        if (input.equals(secret)) {
-//            loginState = true;
-//            return true;
-//        }
-//        blackList.add(id);
-//        return false;
-//    }
-
-
 
     public boolean isValidNumber(int number) {
         if (number > 0 && number <= 999) {
             return true;
         }
         return false;
-    }
-
-    private boolean isInBlackList(Integer number){
-            userCrud.
-
-        return true;
     }
 
 }
